@@ -1,0 +1,28 @@
+{
+  "name": "react-pushstate-mixin",
+  "version":"0.0.1",
+  "description": "React mixin for History API support",
+  "main":"PushStateMixin.js",
+  "dependencies":{
+    "react-tools":"0.5.x"
+  },
+  "repository":{
+    "type":"git",
+    "url": "git://github.com/SanderSpies/react-PushStateMixin.git"
+  },
+  "homepage":"https://github.com/SanderSpies/react-PushStateMixin",
+  "keywords": [
+    "react",
+    "reactjs",
+    "history",
+    "pushstate",
+    "replacestate",
+    "mixin"
+  ],
+  "author":{
+    "name": "Sander Spies",
+    "email": "sandermail@gmail.com"
+  },
+  "license":"MIT"
+
+}
