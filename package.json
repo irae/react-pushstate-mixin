@@ -8,9 +8,9 @@
   },
   "repository":{
     "type":"git",
-    "url": "git://github.com/SanderSpies/react-PushStateMixin.git"
+    "url": "git://github.com/SanderSpies/react-pushstate-mixin.git"
   },
-  "homepage":"https://github.com/SanderSpies/react-PushStateMixin",
+  "homepage":"https://github.com/SanderSpies/react-pushstate-mixin",
   "keywords": [
     "react",
     "reactjs",
