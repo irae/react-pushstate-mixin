@@ -1,25 +1,38 @@
 var PushStateMixin = (function() {
 
+  /**
+   * Get all the children for a React Component
+   *
+   * @returns {Array}
+   */
   function getAllChildren(){
     var children = this.props.children,
       childrenList = [],
       child;
 
-    if(this.props.children){
+    if(children){
+      if(!children.length){
+        children = [children];
+      }
+
       for(var i = 0, l = children.length; i < l; i++){
         child = children[i];
-
         if(child.state !== undefined && !child.__disablePushState){
           childrenList.push(child);
-          childrenList = childrenList.concat(getAllChildren.call(child));
         }
 
+        childrenList = childrenList.concat(getAllChildren.call(child));
       }
     }
 
     return childrenList;
   }
 
+  /**
+   * Get states for ReactComponents
+   *
+   * @returns {{}}
+   */
   function getStates(){
     var children = getAllChildren.call(this),
       states = {},
@@ -40,13 +53,19 @@ var PushStateMixin = (function() {
 
     componentDidUpdate: function(){
       var states = getStates.call(this);
-      window.history.replaceState(states, "", "");
+      var newHistoryState = window.history.state || {};
+      newHistoryState.__reactStates = states;
+      window.history.replaceState(newHistoryState, "", "");
     },
 
+    /**
+     * Helper function to push to history from component and SubComponents
+     */
     pushState: function(){
       var states = getStates.call(this);
-      // TODO: play nice with states of other systems
-      window.history.pushState(states, "", "");
+      var newHistoryState = window.history.state || {};
+      newHistoryState.__reactStates = states;
+      window.history.pushState(newHistoryState, "", "");
     },
 
     componentWillMount: function(){
@@ -57,7 +76,6 @@ var PushStateMixin = (function() {
 
       for(var i = 0, l = children.length; i < l; i++) {
         child = children[i];
-
         if(child.props.id){
           clone = child.componentWillUpdate;
           child.componentDidUpdate = function(e){
@@ -71,12 +89,14 @@ var PushStateMixin = (function() {
       }
 
       window.addEventListener("popstate", function(e){
-        var child;
-        if(e.state){
+
+        var state = e.state || window.history.state || {};
+
+        if(state && state.__reactStates){
           for(var i = 0, l = children.length; i < l; i++){
             child = children[i];
             child.__disablePushState = true;
-            child.setState(e.state[child.props.id]);
+            child.setState(state.__reactStates[child.props.id]);
             child.__disablePushState = false;
           }
         }
@@ -95,4 +115,4 @@ var PushStateMixin = (function() {
   return mixin;
 })();
 
-module ? module.exports = PushStateMixin : null;
+//!window && module ? module.exports = PushStateMixin : null;

@@ -1,10 +1,58 @@
 <DOCTYPE html>
 <html>
     <head>
-        <script src="React.js" type="text/javascript"></script>
-        <script src="PushStateMixin.js" type="text/javascript"></script>
+
     </head>
     <body>
-        TODO
+        <div id="container"></div>
+
+        <script src="react.js" type="text/javascript"></script>
+        <script src="JSXTransformer.js" type="text/javascript"></script>
+
+        <script src="PushStateMixin.js" type="text/javascript"></script>
+        <script type="text/jsx">
+            /** @jsx React.DOM */
+            var ListItem = React.createClass({
+
+                getInitialState: function(){
+                    return {
+                        tick: 0
+                    };
+                },
+
+                _onClick: function(){
+                    this._increaseTick();
+                },
+
+                _increaseTick: function(){
+                    this.setState({tick: this.state.tick + 1});
+                    if(this.props.pushState){
+                        this.pushState();
+                    }
+                },
+
+                render: function(){
+                    var prefix = this.props.pushState ? "PushState " : "";
+                    return <li id={this.props.id} onClick={this._onClick}>{prefix}Tick: {this.state.tick}</li>;
+                }
+            })
+
+            var ListComponent = React.createClass({
+                mixins:[PushStateMixin],
+                render: function(){
+                    return <ul>{this.props.children}</ul>;
+                }
+            });
+
+            React.renderComponent(<div>
+                <ListComponent>
+                    <ListItem id="1" />
+                    <div>
+                        <ListItem id="2" pushState={true} />
+                    </div>
+                </ListComponent>
+
+            </div>, document.getElementById('container'));
+        </script>
     </body>
 </html>
