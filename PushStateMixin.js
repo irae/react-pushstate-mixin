@@ -89,9 +89,7 @@ var PushStateMixin = (function() {
       }
 
       window.addEventListener("popstate", function(e){
-
         var state = e.state || window.history.state || {};
-
         if(state && state.__reactStates){
           for(var i = 0, l = children.length; i < l; i++){
             child = children[i];
@@ -115,4 +113,6 @@ var PushStateMixin = (function() {
   return mixin;
 })();
 
-//!window && module ? module.exports = PushStateMixin : null;
+if(!window && exports){
+  exports = PushStateMixin;
+}
