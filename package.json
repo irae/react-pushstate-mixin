@@ -1,9 +1,9 @@
 {
   "name": "react-pushstate-mixin",
-  "version":"0.0.1",
+  "version":"0.0.3",
   "description": "React mixin for History API support",
   "main":"PushStateMixin.js",
-  "dependencies":{
+  "peerDependencies":{
     "react-tools":"0.5.x"
   },
   "repository":{
@@ -24,5 +24,4 @@
     "email": "sandermail@gmail.com"
   },
   "license":"MIT"
-
 }

@@ -1,5 +1,9 @@
 var PushStateMixin = (function() {
 
+  if(!window || !window.history){
+    return;
+  }
+
   /**
    * Get all the children for a React Component
    *
@@ -8,14 +12,16 @@ var PushStateMixin = (function() {
   function getAllChildren(){
     var children = this.props.children,
       childrenList = [],
-      child;
+      child,
+      i,
+      l;
 
     if(children){
       if(!children.length){
         children = [children];
       }
 
-      for(var i = 0, l = children.length; i < l; i++){
+      for(i = 0, l = children.length; i < l; i++){
         child = children[i];
         if(child.state !== undefined && !child.__disablePushState){
           childrenList.push(child);
@@ -36,9 +42,11 @@ var PushStateMixin = (function() {
   function getStates(){
     var children = getAllChildren.call(this),
       states = {},
-      child;
+      child,
+      i = 0,
+      l = children.length;
 
-    for(var i = 0, l = children.length; i < l; i++){
+    for(; i < l; i++){
       child = children[i];
       if(child.state && child.props.id){
         states[child.props.id] = child.state;
@@ -52,29 +60,33 @@ var PushStateMixin = (function() {
   var mixin = {
 
     componentDidUpdate: function(){
-      var states = getStates.call(this);
-      var newHistoryState = window.history.state || {};
+      var states = getStates.call(this),
+          newHistoryState = window.history.state || {};
       newHistoryState.__reactStates = states;
-      window.history.replaceState(newHistoryState, "", "");
+      window.history.replaceState(newHistoryState, document.title, document.domain ? window.location.pathname + window.location.search : null);
     },
 
     /**
      * Helper function to push to history from component and SubComponents
      */
-    pushState: function(){
-      var states = getStates.call(this);
-      var newHistoryState = window.history.state || {};
+    pushState: function(title, url){
+      var states = getStates.call(this),
+        newHistoryState = window.history.state || {},
+        newUrl;
       newHistoryState.__reactStates = states;
-      window.history.pushState(newHistoryState, "", "");
+      newUrl = url || (window.location.pathname + window.location.search);
+      window.history.pushState(newHistoryState, title || document.title, document.domain ? newUrl : null);
     },
 
     componentWillMount: function(){
       var children = getAllChildren.call(this),
         child,
         clone,
-        self = this;
+        self = this,
+        i,
+        l;
 
-      for(var i = 0, l = children.length; i < l; i++) {
+      for(i = 0, l = children.length; i < l; i++) {
         child = children[i];
         if(child.props.id){
           clone = child.componentWillUpdate;
@@ -89,9 +101,11 @@ var PushStateMixin = (function() {
       }
 
       window.addEventListener("popstate", function(e){
-        var state = e.state || window.history.state || {};
+        var state = e.state || window.history.state || {},
+          i = 0,
+          l = children.length;
         if(state && state.__reactStates){
-          for(var i = 0, l = children.length; i < l; i++){
+          for(; i < l; i++){
             child = children[i];
             child.__disablePushState = true;
             child.setState(state.__reactStates[child.props.id]);
@@ -99,7 +113,7 @@ var PushStateMixin = (function() {
           }
         }
         else {
-          for(var i = 0, l = children.length; i < l; i++){
+          for(; i < l; i++){
             child = children[i];
             child.__disablePushState = true;
             child.setState(child.getInitialState());
